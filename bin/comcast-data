@@ -21,5 +21,4 @@ if (!$usage) {
 my $budgeted = $c->get_budgeted_usage();
 
 # Print in Cacti-readable format
-print( 'Usage: ', $usage, "\n");
-print( 'Budgeted: ', $budgeted, "\n");
+print( 'Usage:', $usage, ' Budgeted:', $budgeted );

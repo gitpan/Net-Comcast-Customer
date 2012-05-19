@@ -16,7 +16,7 @@ WriteMakefile(
             resources => {
                 license        => 'http://dev.perl.org/licenses/',
                 homepage       => 'http://www.ktdreyer.com',
-                Repository     => 'https://gitorious.org/ktdreyer/net-comcast-customer',
+                repository     => 'https://gitorious.org/ktdreyer/net-comcast-customer',
             },
         } ) : ()
     ),

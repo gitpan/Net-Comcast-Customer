@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Net-Comcast-Customer
-version:            1.0
+version:            1.1
 abstract:           Comcast Customer Central web interface
 author:
     - Ken Dreyer <ktdreyer@ktdreyer.com>
@@ -18,7 +18,7 @@ requires:
 resources:
     homepage:    http://www.ktdreyer.com
     license:     http://dev.perl.org/licenses/
-    Repository:  https://gitorious.org/ktdreyer/net-comcast-customer
+    repository:  https://gitorious.org/ktdreyer/net-comcast-customer
 no_index:
     directory:
         - t

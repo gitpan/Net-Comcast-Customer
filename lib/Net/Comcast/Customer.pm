@@ -11,11 +11,11 @@ Net::Comcast::Customer - Comcast Customer Central web interface
 
 =head1 VERSION
 
-Version 1.0
+Version 1.1
 
 =cut
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ This module could do much more (patches welcome). Also, Comcast apparently break
 # Comcast constants
 my $LOGIN_URL = 'https://customer.comcast.com/Secure/Home.aspx';
 my $USAGE_URL = 'https://customer.comcast.com/Secure/UsageMeterDetail.aspx';
-my $USER_AGENT = 'Mozilla/5.0 (X11; Linux i686; rv:6.0) Gecko/20100101 Firefox/6.0';
+my $USER_AGENT = 'Mozilla/5.0 (X11; Linux i686; rv:12.0) Gecko/20100101 Firefox/12.0';
 # Monthly GB limit
 # This was hard to scrape reliably from the HTML, so I'm hardcoding here.
 my $MAX_GB = '250';
@@ -91,7 +91,9 @@ sub debug {
 
 =head2 mech
 
-WWW::Mech accessor. Returns a WWW::Mechanize object. You probably won't need to use this in your own code.
+WWW::Mech accessor. You probably won't need to use this in your own code.
+
+Returns a WWW::Mechanize object.
 
 =cut
 
@@ -243,6 +245,10 @@ Ken Dreyer, C<< <ktdreyer at ktdreyer.com> >>
 
 All the poor souls on the internet who have tried to scrape this bandwidth information and failed.
 
+=head1 SEE ALSO
+
+Comcast's L<"Data Usage Meter Information"|http://networkmanagement.comcast.net/datausagemeter.htm> documentation. 
+
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2011 Ken Dreyer.
@@ -251,6 +257,6 @@ This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See L<http://dev.perl.org/licenses/> for more information.
 
 =cut
