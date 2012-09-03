@@ -11,11 +11,11 @@ Net::Comcast::Customer - Comcast Customer Central web interface
 
 =head1 VERSION
 
-Version 1.1
+Version 1.2
 
 =cut
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 =head1 SYNOPSIS
 
@@ -36,6 +36,8 @@ Access Comcast's Customer website.
 
 Comcast Customer Central is "The one place where you can view and pay your bill, and manage all your Comcast product features and settings." Since Comcast has a 250 GB/month data cap, this module will allow you to view your total bandwidth used and your current "budgeted" bandwidth. The data is suitable for exporting into monitoring tools like RRDtool and Cacti.
 
+In other words, this module is a programmatic interface to what you can see at L<https://customer.comcast.com/Secure/UsageMeterDetail.aspx> .
+
 This module could do much more (patches welcome). Also, Comcast apparently breaks this all the time, so good luck!
 
 =cut
@@ -44,9 +46,6 @@ This module could do much more (patches welcome). Also, Comcast apparently break
 my $LOGIN_URL = 'https://customer.comcast.com/Secure/Home.aspx';
 my $USAGE_URL = 'https://customer.comcast.com/Secure/UsageMeterDetail.aspx';
 my $USER_AGENT = 'Mozilla/5.0 (X11; Linux i686; rv:12.0) Gecko/20100101 Firefox/12.0';
-# Monthly GB limit
-# This was hard to scrape reliably from the HTML, so I'm hardcoding here.
-my $MAX_GB = '250';
 
 =head1 METHODS
 
@@ -62,6 +61,10 @@ sub new {
 		'mech' => WWW::Mechanize->new(
 			agent => $USER_AGENT,
 		),
+		# Monthly GB limit
+		# This was hard to scrape reliably from the HTML, so I'm
+		# hardcoding here.
+		'max_gb' => 250,
 		'debug' => 0,
 	};
 	bless($self, $class);
@@ -101,6 +104,23 @@ sub mech {
         my $self = shift;
         if (@_) { $self->{'mech'} = shift; }
         return $self->{'mech'};
+}
+
+
+=head2 max_gb
+
+Monthly Gigabyte limit accessor. Defaults to 250.
+
+Comcast has plans to change this to 300 in the future. Read more on the L<"Comcast blog entry"|http://blog.comcast.com/2012/05/comcast-to-replace-usage-cap-with-improved-data-usage-management-approaches.html> and L<"Comcast FAQ page"|https://customer.comcast.com/help-and-support/internet/data-usage-what-are-the-different-plans-launching/> .
+
+Returns an integer.
+
+=cut
+
+sub max_gb {
+        my $self = shift;
+        if (@_) { $self->{'max_gb'} = shift; }
+        return $self->{'max_gb'};
 }
 
 
@@ -172,7 +192,7 @@ sub _get_usage_from_content {
 	my $html = shift || croak("HTML content argument missing");
 
 	# These GB values are integers, or "<1" for "less than one GB".
-	my ($used) = $html =~ /<span id="ctl00_ctl00_ContentArea_PrimaryColumnContent_UsedWrapper">(<?\d+)GB<\/span>/s;
+	my ($used) = $html =~ /<span id="[^"]*Used[^"]*">(<?\d+)GB<\/span>/s;
 	my ($remaining) = $html =~ /<span id="ctl00_ctl00_ContentArea_PrimaryColumnContent_UsedWrapper"><?(<?\d+)GB<\/span>/s;
 	
 	# Get rid of that pesky less-than sign.
@@ -184,12 +204,12 @@ sub _get_usage_from_content {
 	}
 
 	# Sanity check
-	if (!$used && $self->debug > 0) {
+	if (!defined($used) && $self->debug > 0) {
 		carp("could not find usage data in HTML.");
 		# Try to find the chunk of HTML that generally has what we need.
-		my ($usagegraph) = $html =~ /<tr id="usagegraph">(.+)<\/tr>/s;
-		if ($usagegraph) {
-			carp($usagegraph);
+		my ($dataused) = $html =~ /<div id="ctl00_ctl00_ContentArea_PrimaryColumnContent_ctl18_DataUsed"(.+?)<\/div>/s;
+		if ($dataused) {
+			carp($dataused);
 		} else {
 			# Just print the entire thing.
 			carp($html);
@@ -203,7 +223,7 @@ sub _get_usage_from_content {
 
 Get your budgeted data usage in GB.  For planning purposes, you'll want to correlate this value with what you get from get_usage().
 
-Each month Comcast resets their counters to zero. If your cap is 250 GB/month (it is), then on the first day of the month, you should use about 8 GB. After the second day of the month, your usage should be up to 16 GB. After the third day, 24 GB. And so on...
+Each month Comcast resets their counters to zero. If your cap is 250 GB/month, then on the first day of the month, you should use about 8 GB. After the second day of the month, your usage should be up to 16 GB. After the third day, 24 GB. And so on...
 
 This get_budgeted_usage() method does the math for you. Using localtime(), it will figure out how much bandwidth you should have used B<right now>. If you graph this value, it will give you a trend line that will help you know how well you're doing at staying under your limit.
 
@@ -216,6 +236,8 @@ Returns a floating point value.
 =cut
 
 sub get_budgeted_usage {
+	my $self = shift;
+
 	# Get today's date info.
 	my (undef, undef, $hour, $day, $month, $year) = localtime;
 	$month++;
@@ -228,7 +250,7 @@ sub get_budgeted_usage {
 	# Divide "now" by the total number of hours.
 	my $fraction = $hours / $hours_in_month;
 	# Find out our budgeted GB value.
-	my $budgeted_gb = $MAX_GB * $fraction;
+	my $budgeted_gb = $self->max_gb * $fraction;
 	$budgeted_gb = sprintf("%.3f", $budgeted_gb);
 	return $budgeted_gb;
 }
@@ -243,7 +265,7 @@ Ken Dreyer, C<< <ktdreyer at ktdreyer.com> >>
 
 =head1 ACKNOWLEDGEMENTS
 
-All the poor souls on the internet who have tried to scrape this bandwidth information and failed.
+All the brave souls on the internet who have tried to scrape this bandwidth information and failed.
 
 =head1 SEE ALSO
 

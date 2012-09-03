@@ -2,6 +2,8 @@ Net-Comcast-Customer
 
 Comcast Customer Central is "The one place where you can view and pay your bill, and manage all your Comcast product features and settings." Since Comcast has a 250 GB/month data cap, this module will allow you to view your total bandwidth used and your current "budgeted" bandwidth. The data is suitable for exporting into monitoring tools like RRDtool and Cacti.
 
+In other words, this module is a programmatic interface to what you can see at https://customer.comcast.com/Secure/UsageMeterDetail.aspx .
+
 This module could do much more (patches welcome). Also, Comcast apparently breaks this all the time, so good luck!
 
 

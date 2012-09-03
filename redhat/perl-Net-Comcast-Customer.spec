@@ -1,5 +1,5 @@
 Name:           perl-Net-Comcast-Customer
-Version:        1.1
+Version:        1.2
 Release:        1%{?dist}
 Summary:        Comcast Customer Central web interface
 License:        GPL+ or Artistic
@@ -50,7 +50,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/*
 
 %changelog
-* Sat May 19 2011 ktdreyer@ktdreyer.com 1.1-1
+* Mon Sep 03 2012 Ken Dreyer <ktdreyer@ktdreyer.com> 1.2-1
+- New upstream version
+
+* Sat May 19 2012 ktdreyer@ktdreyer.com 1.1-1
 - New upstream version
 
 * Mon Sep 05 2011 ktdreyer@ktdreyer.com 1.0-1
